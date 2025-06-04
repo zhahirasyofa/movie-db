@@ -1,33 +1,41 @@
-@extends('layouts/template')
+@extends('layouts.template')
+
+@section('title', 'Homepage')
 
 @section('content')
-    <h2 class="mb-4">Popular Movie</h2>
- 
-    <div class="row row-cols-1 row-cols-md-2 g-4">
+
+    <h1 class="mb-4">Latest Movie</h1>
+
+    <div class="row g-4">
         @foreach ($movies as $movie)
-            <div class="col-md-6">
-                <div class="card mb-3" style="max-width: 540px;">
-                    @if ($movie->cover_image)
-                        <div class="row g-0">
-                            <div class="col-md-4">
-                                <img src="{{ $movie->cover_image }}" class="card-img-top"
-                                    style="height: 300px; object-fit: cover;" alt="{{ $movie->title }}">
+            <div class="col-lg-6 d-flex align-items-stretch">
+                <div class="card w-100">
+                    <div class="row g-0 h-100">
+                        <div class="col-md-4">
+                            <div style="height: 100%; overflow: hidden;">
+                                <img src="{{ filter_var($movie->cover_image, FILTER_VALIDATE_URL) ? $movie->cover_image : asset('covers/' . $movie->cover_image) }}"
+                                    alt="{{ $movie->title }}" class="movie-img" style="object-fit: cover; width: 100%";>
                             </div>
-                            <div class="col-md-8">
-                    @endif
-                    <div class="card-body d-flex flex-column justify-content-between h-100">
-                        <h5 class="card-title">{{ $movie->title }}</h5>
-                        <p class="card-text">{{ Str::limit($movie->synopsis, 150) }}</p>
-                        <p class="card-text"><a href="#" class="btn btn-success ">Read More</a></p>
+                        </div>
+                        <div class="col-md-8 d-flex flex-column">
+                            <div class="card-body d-flex flex-column flex-grow-1">
+                                <h5 class="card-title">{{ $movie->title }}</h5>
+                                <p class="card-text">{{ Str::words($movie->synopsis, 15) }}</p>
+                                <p class="card-text mt-auto">
+                                    <small class="text-body-secondary">Year: {{ $movie->year }}</small>
+                                </p>
+                                <a href="/movie/{{ $movie->id }}/{{ $movie->slug }}" class="btn btn-success mt-3">Read
+                                    More</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-    </div>
-    </div>
-    @endforeach
+        @endforeach
     </div>
 
-    <div>
-        {{ $movies->links('pagination::bootstrap-5') }}
+    <div class="mt-4">
+        {{ $movies->links() }}
     </div>
+
 @endsection
